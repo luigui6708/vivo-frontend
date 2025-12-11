@@ -32,8 +32,19 @@ export async function createLote(formData: FormData) {
         const password = process.env.ODOO_PASSWORD || 'admin';
 
         // 1. Get Picking Type (incoming) and Supplier Location
-        // We do this dynamically to be robust
-        const typeId = 1; // Standard 'Receipts' ID from inspection
+        const pickingTypes = await new Promise<any[]>((resolve, reject) => {
+            odooClient.object.methodCall('execute_kw', [
+                db, uid, password,
+                'stock.picking.type', 'search',
+                [[['code', '=', 'incoming']]],
+                { limit: 1 }
+            ], (err, res) => err ? reject(err) : resolve(res));
+        });
+
+        if (!pickingTypes || pickingTypes.length === 0) {
+            throw new Error('No se encontró un tipo de operación de recepción (incoming).');
+        }
+        const typeId = pickingTypes[0];
 
         // Find Supplier Location (Usage = supplier)
         const supplierLocIds = await new Promise<any[]>((resolve, reject) => {

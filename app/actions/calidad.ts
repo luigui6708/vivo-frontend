@@ -16,19 +16,67 @@ export async function registrarCalidad(formData: FormData) {
     const ph = formData.get('ph') as string;
     const defectos = formData.get('defectos') as string;
     const observaciones = formData.get('observaciones') as string;
-    const decision = formData.get('decision') as string; // Aprobado/Rechazado
+    const decision = formData.get('decision') as string;
+
+    // Campos Avanzados (Checklist)
+    const ppm_hipoclorito = formData.get('ppm_hipoclorito') || 'N/A';
+    const ppm_peracetico = formData.get('ppm_peracetico') || 'N/A';
+    const peso_caja = formData.get('peso_caja') || 'N/A';
+    const eliminacion_menor_46mm = formData.get('eliminacion_menor_46mm') || 'N/A';
 
     if (!mo_id) return { success: false, message: "ID de Orden no válido" };
 
+    // Format Body as Rich HTML Table matching documentation style
     const body = `
-        <h3>📋 Inspección de Calidad</h3>
-        <ul>
-            <li><strong>Decision:</strong> ${decision}</li>
-            <li><strong>Brix:</strong> ${brix}</li>
-            <li><strong>pH:</strong> ${ph}</li>
-            <li><strong>Defectos (%):</strong> ${defectos}%</li>
-            <li><strong>Observaciones:</strong> ${observaciones}</li>
-        </ul>
+        <div style="font-family: Arial, sans-serif;">
+            <h2 style="color: #2e3b4e; border-bottom: 2px solid #4f46e5; padding-bottom: 5px;">📋 Inspección de Calidad (Checklist Operativo)</h2>
+            
+            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                <tr style="background-color: #f3f4f6;">
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Punto de Control</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Valor Registrado</th>
+                    <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Meta / Referencia</th>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;"><strong>Dictamen Final</strong></td>
+                    <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; color: ${decision === 'Aprobado' ? 'green' : 'red'};">${decision}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">-</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Grados Brix</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${brix}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Min 9.0</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">pH</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${ph}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">2.5 - 4.5</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Hipoclorito (ppm)</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${ppm_hipoclorito} ppm</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">200 ppm</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Ácido Peracético (ppm)</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${ppm_peracetico} ppm</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">85 ppm</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Peso Caja Promedio</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${peso_caja} kg</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">17.30 kg</td>
+                </tr>
+                <tr>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Eliminación &lt; 46mm</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">${eliminacion_menor_46mm}</td>
+                    <td style="padding: 8px; border: 1px solid #ddd;">Requerido</td>
+                </tr>
+            </table>
+
+            <p style="margin-top: 15px;"><strong>Observaciones:</strong> <br/> ${observaciones}</p>
+            <p style="font-size: 0.8em; color: #666;">Registrado desde VIVO Frontend</p>
+        </div>
     `;
 
     try {
