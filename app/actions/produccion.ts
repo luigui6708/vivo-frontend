@@ -32,3 +32,28 @@ export async function getOrdenesProduccion(): Promise<OrdenProduccion[]> {
         return [];
     }
 }
+
+export async function finalizarOrden(id: number) {
+    console.log(`Finalizing Production Order ${id}...`);
+    try {
+        const { odooClient, authenticate } = require('@/lib/odoo');
+        const uid = await authenticate();
+        const db = process.env.ODOO_DB || 'vivo_db';
+        const password = process.env.ODOO_PASSWORD || 'admin';
+
+        await new Promise((resolve, reject) => {
+            odooClient.object.methodCall('execute_kw', [
+                db, uid, password,
+                'mrp.production', 'button_mark_done',
+                [[id]],
+            ], (err: any, res: any) => err ? reject(err) : resolve(res));
+        });
+
+        const { revalidatePath } = require('next/cache');
+        revalidatePath('/produccion');
+        return { success: true, message: "Orden finalizada y stock consumido." };
+    } catch (error: any) {
+        console.error("Error finalizing order:", error);
+        return { success: false, message: "Error al finalizar: " + error.message };
+    }
+}

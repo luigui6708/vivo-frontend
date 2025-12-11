@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getOrdenesProduccion, OrdenProduccion } from '@/app/actions/produccion';
+import FinalizarButton from '@/components/FinalizarButton';
 
 // Helper to calculate KPIs
 function calculateKPIs(ordenes: OrdenProduccion[]) {
@@ -90,15 +91,18 @@ export default async function ProduccionPage() {
                                         {op.date_start as string || '-'}
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
-                                        <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${op.state === 'done' ? 'bg-green-100 text-green-800' :
-                                            op.state === 'progress' ? 'bg-amber-100 text-amber-800' :
-                                                op.state === 'confirmed' ? 'bg-blue-100 text-blue-800' :
-                                                    'bg-gray-100 text-gray-800'
-                                            }`}>
-                                            {op.state === 'progress' ? 'En Proceso' :
-                                                op.state === 'confirmed' ? 'Por Iniciar' :
-                                                    op.state === 'done' ? 'Terminado' : op.state}
-                                        </span>
+                                        <div className="flex items-center space-x-2">
+                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${op.state === 'done' ? 'bg-green-100 text-green-800' :
+                                                op.state === 'progress' ? 'bg-amber-100 text-amber-800' :
+                                                    op.state === 'confirmed' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-gray-100 text-gray-800'
+                                                }`}>
+                                                {op.state === 'progress' ? 'En Proceso' :
+                                                    op.state === 'confirmed' ? 'Por Iniciar' :
+                                                        op.state === 'done' ? 'Terminado' : op.state}
+                                            </span>
+                                            <FinalizarButton id={op.id} state={op.state} />
+                                        </div>
                                     </td>
                                 </tr>
                             ))
