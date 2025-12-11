@@ -23,6 +23,7 @@ export default function Navbar({ user }: NavbarProps) {
         { name: 'Producción', href: '/produccion', requiredGroup: 'Manufacturing' },
         { name: 'Calidad', href: '/calidad', requiredGroup: 'Manufacturing' },
         { name: 'Ventas', href: '/ventas', requiredGroup: 'Sales' },
+        { name: 'IA 🧠', href: '/inteligencia', requiredGroup: null },
         { name: 'Ayuda ❓', href: '/ayuda', requiredGroup: null },
     ];
 
